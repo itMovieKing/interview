@@ -28,4 +28,26 @@ var merge = function(nums1, m, nums2, n) {
   return nums1
 };
 
-console.log(merge([1,2,3,0,0,0],3,[2,5,6],3))
+/**
+ * 移除元素
+ * @param {number[]} nums
+ * @param {number} val
+ * @return {number}
+ */
+// 快慢指针解法
+// 快指针遍历数组，当快指针指向的元素不等于val时，赋值给慢指针，且快慢指针都加一，
+// 当快指针指向元素不等于val时，快指针加一，满指针不动
+var removeElement = function(nums, val) {
+  let left = 0; 
+  let right = 0;
+  while(right < nums.length) {
+    if(nums[right]  !== val) {
+      nums[left] = nums[right]
+      left++
+      right++
+    } else {
+      right++
+    }
+  }
+  return left
+};
