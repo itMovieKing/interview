@@ -66,15 +66,12 @@ var removeDuplicates = function(nums) {
   let left = 0; 
   let right = 0;
   while(right < nums.length) {
-      if(nums[left] === nums[right]) {
-          right++
-      } else{
-        // left应该是指向不重复的最后一项，所以被覆盖的应该是left的下一个位置
-          nums[left] = nums[right]
-          left++
-          right++
+    // left指向最后一个不重复元素，所以不重复的时候赋值给他的下一位
+      if(nums[left] !== nums[right]) {
+        nums[++left] = nums[right]
       }
+      right++
   }
   return left
 };
-removeDuplicates([0,0,1,1,1,2,2,3,3,4])
+removeDuplicates([1,1,2])
