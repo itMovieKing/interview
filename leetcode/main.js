@@ -72,6 +72,7 @@ var removeDuplicates = function(nums) {
       }
       right++
   }
-  return left
+  // 最后要返回的是不重复元素的个数，当前left指向是下标
+  return left + 1
 };
 removeDuplicates([1,1,2])
