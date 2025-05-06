@@ -51,3 +51,30 @@ var removeElement = function(nums, val) {
   }
   return left
 };
+
+
+/**
+ * 删除有序数组中的重复项
+ * @param {number[]} nums
+ * @return {number}
+ * 
+ */
+
+// 依旧是快慢指针
+
+var removeDuplicates = function(nums) {
+  let left = 0; 
+  let right = 0;
+  while(right < nums.length) {
+      if(nums[left] === nums[right]) {
+          right++
+      } else{
+        // left应该是指向不重复的最后一项，所以被覆盖的应该是left的下一个位置
+          nums[left] = nums[right]
+          left++
+          right++
+      }
+  }
+  return left
+};
+removeDuplicates([0,0,1,1,1,2,2,3,3,4])
