@@ -1,124 +1,91 @@
-import React, { useState } from 'react';
-import { Meta, StoryFn } from '@storybook/react';
+import React from 'react';
+import type { Meta, StoryObj } from '@storybook/react';
 import TaskManagementPanel from './TaskManagementPanel';
-import { Task } from './TaskManagementPanel.types';
-import { TaskManagementPanelProps } from './TaskManagementPanel.types';
+import { Task } from './interface';
 
-export default {
+const meta: Meta<typeof TaskManagementPanel> = {
   title: 'Components/TaskManagementPanel',
   component: TaskManagementPanel,
   parameters: {
-    docs: {
-      description: {
-        component: '任务管理面板组件，用于显示、搜索、添加、删除任务以及标记任务完成状态。'
-      }
-    }
+    layout: 'centered',
   },
-  argTypes: {
-    title: {
-      control: 'text',
-      description: '面板标题',
-      defaultValue: '任务管理面板'
-    },
-    loading: {
-      control: 'boolean',
-      description: '加载状态',
-      defaultValue: false
-    }
-  }
-} as Meta;
+  tags: ['autodocs'],
+};
 
-// 模板
-const Template: StoryFn = (args) => {
-  // 模拟任务数据
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', content: '任务一任务一任务一任务一任务一', completed: true },
-    { id: '2', content: '任务二任务二任务二任务二任务二任务二任务二', completed: true },
-    { id: '3', content: '任务三任务三任务三任务三任务三任务三任务三任务三任务三', completed: false },
-    { id: '4', content: '任务四任务四任务四任务四任务四任务四任务四任务四任务四', completed: false }
-  ]);
-  
-  // 模拟过滤后的任务
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>(tasks);
-  
-  // 搜索任务
-  const handleSearch = (keyword: string) => {
-    if (!keyword) {
-      setFilteredTasks(tasks);
-      return;
-    }
+export default meta;
+type Story = StoryObj<typeof TaskManagementPanel>;
+
+// 模拟任务数据
+const mockTasks: Task[] = [
+  { id: '1', content: '任务一任务一任务一任务一任务一', completed: true },
+  { id: '2', content: '任务二任务二任务二任务二任务二任务二任务二', completed: true },
+  { id: '3', content: '任务三任务三任务三任务三任务三任务三任务三任务三', completed: false },
+  { id: '4', content: '任务四任务四任务四任务四任务四任务四任务四任务四任务四任务四', completed: false },
+];
+
+// 默认故事
+export const Default: Story = {
+  args: {
+    initialTasks: mockTasks,
+    title: '任务管理面板',
+  },
+};
+
+// 空状态故事
+export const Empty: Story = {
+  args: {
+    initialTasks: [],
+    title: '任务管理面板',
+  },
+};
+
+// 加载状态故事
+export const Loading: Story = {
+  args: {
+    initialTasks: mockTasks,
+    loading: true,
+    title: '任务管理面板',
+  },
+};
+
+// 交互式故事
+export const Interactive: Story = {
+  render: () => {
+    const [tasks, setTasks] = React.useState<Task[]>(mockTasks);
     
-    const filtered = tasks.filter(task => 
-      task.content.toLowerCase().includes(keyword.toLowerCase())
-    );
-    setFilteredTasks(filtered);
-  };
-  
-  // 添加任务
-  const handleAddTask = (content: string) => {
-    const newTask: Task = {
-      id: Date.now().toString(),
-      content,
-      completed: false
+    const handleTasksChange = (newTasks: Task[]) => {
+      setTasks(newTasks);
+      console.log('Tasks changed:', newTasks);
     };
-    const updatedTasks = [...tasks, newTask];
-    setTasks(updatedTasks);
-    setFilteredTasks(updatedTasks);
-  };
-  
-  // 删除任务
-  const handleDeleteTask = (taskId: string) => {
-    const updatedTasks = tasks.filter(task => task.id !== taskId);
-    setTasks(updatedTasks);
-    setFilteredTasks(updatedTasks);
-  };
-  
-  // 切换任务状态
-  const handleToggleTaskStatus = (taskId: string, completed: boolean) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, completed } : task
+    
+    const handleAddTask = (task: Task) => {
+      console.log('Task added:', task);
+    };
+    
+    const handleDeleteTask = (taskId: string) => {
+      console.log('Task deleted:', taskId);
+    };
+    
+    const handleUpdateTaskStatus = (taskId: string, completed: boolean) => {
+      console.log('Task status updated:', taskId, completed);
+    };
+    
+    const handleSearchTask = (keyword: string) => {
+      console.log('Search task:', keyword);
+    };
+    
+    return (
+      <div style={{ width: '600px' }}>
+        <TaskManagementPanel
+          initialTasks={tasks}
+          onTasksChange={handleTasksChange}
+          onAddTask={handleAddTask}
+          onDeleteTask={handleDeleteTask}
+          onUpdateTaskStatus={handleUpdateTaskStatus}
+          onSearchTask={handleSearchTask}
+          title="交互式任务管理面板"
+        />
+      </div>
     );
-    setTasks(updatedTasks);
-    setFilteredTasks(updatedTasks.filter(task => 
-      filteredTasks.some(ft => ft.id === task.id)
-    ));
-  };
-  
-  return (
-    <TaskManagementPanel
-      {...args}
-      tasks={filteredTasks}
-      onSearch={handleSearch}
-      onAddTask={handleAddTask}
-      onDeleteTask={handleDeleteTask}
-      onToggleTaskStatus={handleToggleTaskStatus}
-    />
-  );
-};
-
-export const Default = Template.bind({});
-Default.args = {
-  title: '任务管理面板',
-  loading: false
-};
-
-export const Loading = Template.bind({});
-Loading.args = {
-  title: '任务管理面板',
-  loading: true
-};
-
-export const EmptyTasks = (args: Partial<TaskManagementPanelProps>) => (
-  <TaskManagementPanel
-    {...args}
-    tasks={[]}
-    onSearch={() => {}}
-    onAddTask={() => {}}
-    onDeleteTask={() => {}}
-    onToggleTaskStatus={() => {}}
-  />
-);
-EmptyTasks.args = {
-  title: '任务管理面板 - 空列表',
-  loading: false
+  },
 }; 
