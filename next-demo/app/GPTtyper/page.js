@@ -3,9 +3,11 @@ import { useRef, useState } from 'react';
  
 const SSEOnlyFE = () => {
     const [data, setData] = useState('');
+    const [loading, setLoading] = useState(false);
     const timer = useRef(null)
     const handleClick = () => {
         setData('思考中...')
+        setLoading(true);
         clearTimer()
         fetch('http://localhost:5001/sse').then(response => {
             if (!response.ok) {
@@ -15,11 +17,15 @@ const SSEOnlyFE = () => {
         }).then(resData => {
             setData('')
             const rst = filterData(resData)
+            console.log({rst});
+            
             timerEffect(rst)
         })
     }
   
     const filterData = (dataString) => {
+      console.log({dataString});
+      
         let rst = ''
         const dataBlocks = dataString.split('data:');
         // 过滤掉第一个空项（由于split()在字符串开始处不匹配）
@@ -46,6 +52,7 @@ const SSEOnlyFE = () => {
                 setData(prevData => prevData + content);
             } else {
                 clearTimer()
+                setLoading(false);
             }
         }, 200)
     }
@@ -63,8 +70,11 @@ const SSEOnlyFE = () => {
         <div className=' p-[10px] w-[400px] h-[200px] bg-slate-200'>
             <div className='w-[80px] h-[30px]  text-center rounded-[10px] bg-blue-300 cursor-pointer' onClick={handleClick}><span>发起请求</span></div>
             <div>
-                <div> ：</div>
-                <div className='text-[#333] w-[300px] '>{data}</div>
+                <div>输出结果：</div>
+                <div className='text-[#333] w-[300px] flex items-center min-h-[30px]'>
+                  {loading && <span className="animate-spin inline-block w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full mr-2"></span>}
+                  {data}
+                </div>
             </div>
         </div>
     </div>

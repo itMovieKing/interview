@@ -6,7 +6,7 @@ app.use(cors());
 
 const PORT = 5001;
 const getTime = () => new Date().toLocaleTimeString();
-const contentStr = "很高兴为您服务，我是模拟的 ChatGPT 机器人。".split('')
+const contentStr = "很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。很高兴为您服务，我是模拟的 ChatGPT 机器人。".split('')
 
 app.get("/sse", function (req, res) {
   res.writeHead(200, {
