@@ -1,39 +1,53 @@
 'use client' 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 const SSEFetchEventSource = () => {
     const [value, setValue] = useState('');
+    const queueRef = useRef([]); // 存储待显示的内容
+    const timerRef = useRef(null);
+
+    const showNextChar = () => {
+        if (queueRef.current.length === 0) {
+            timerRef.current = null;
+            return;
+        }
+        const nextChar = queueRef.current.shift();
+        setValue(prev => prev + nextChar);
+        timerRef.current = setTimeout(showNextChar, 500); // 50ms/字，可调整
+    };
+
+    const handleMessage = (content) => {
+        // 把新内容拆成字符，加入队列
+        queueRef.current.push(...content.split(''));
+        // 如果没有在显示，就启动动画
+        if (!timerRef.current) {
+            showNextChar();
+        }
+    };
 
     const handleClick = () => {
-        setValue('思考中...')
-        fetchEventSource('http://localhost:5001 /sse', {
-            headers: {
-                'authorization': 'test sse'
-            },
-            onopen(res) {
-                console.log('连接:', res)
-                setValue('')
-            },
+        setValue('思考中...');
+        queueRef.current = [];
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+        fetchEventSource('http://localhost:5001/sse', {
+            onopen() { setValue(''); },
             onmessage(res) {
                 try {
                     const jsonData = JSON.parse(res.data);
                     if (jsonData.event === 'start' || jsonData.event === 'message') {
-                        setValue(prevData => prevData + jsonData.content);
-                    } else if (jsonData.event === 'done') {
-                        // 因为本质还是 fetch 接口，当消息发送完毕时，
-                        // 接收到 done 的事件，如无特殊逻辑可以不做处理，有特殊逻辑可以做其他逻辑处理
+                        handleMessage(jsonData.content);
                     }
                 } catch (err) {
-                    console.log(err)
+                    console.log(err);
                 }
             },
-            onerror(err) {
-                console.log('错误:', err)
-            }
-        })
-    }
-
+            onerror(err) { console.log('错误:', err); }
+        });
+    };
 
     return <div className='m-[20px] ml-[40px]'>
         <h2 className='mb-[10px] text-[20px] font-bold'>Fetch 请求 + ReadableStream </h2>
